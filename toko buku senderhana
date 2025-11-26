@@ -149,17 +149,32 @@ def cari_buku():
 
 def tambah_keranjang():
     tampil_buku()
-    while True:
+    bukuditemukan = True
+    stokada = True
+    while bukuditemukan or stokada:
         pilih = input("Masukkan judul buku: ").lower()
+        
         for b in buku_list:
             if b["judul"].lower() == pilih:
-                if b["stok"] > 0:
-                    keranjang.append(b)
-                    b["stok"] -= 1
-                    print("✔ Buku berhasil dimasukkan ke keranjang!")
+                qty = int(input("Jumlah yang dibeli: "))
+
+                if qty <= 0:
+                    print("❌ Jumlah tidak valid!")
+                    return
+
+                if b["stok"] >= qty:
+                    keranjang.append({
+                        "judul": b["judul"],
+                        "harga": b["harga"],
+                        "qty": qty
+                    })
+                    b["stok"] -= qty
+                    print("✔ Buku berhasil ditambahkan ke keranjang!")
                 else:
                     print("❌ Stok habis!")
+                    stokada = False
                 return
+        bukuditemukan = False
         print("❌ Buku tidak ditemukan!")
 
 
@@ -174,9 +189,10 @@ def lihat_keranjang():
 
     total = 0
     nomor = 1
-    for b in keranjang:
-        print(f"{nomor}. {b['judul']} - Rp {b['harga']}")
-        total += b["harga"]
+    for item in keranjang:
+        subtotal = item["harga"] * item["qty"]
+        print(f"{nomor}. {item['judul']} (x{item['qty']}) - Rp {subtotal}")
+        total += subtotal
         nomor += 1
 
     print("💰 Total belanja: Rp", total)
@@ -191,7 +207,7 @@ def pembayaran():
     print("💵 PEMBAYARAN")
     garis()
 
-    total = sum(b["harga"] for b in keranjang)
+    total = sum(item["harga"] * item["qty"] for item in keranjang)
     print("Total yang harus dibayar:", total)
 
     bayar = int(input("Masukkan uang anda: "))
@@ -201,8 +217,25 @@ def pembayaran():
         bayar = int(input("Masukkan uang lagi: "))
 
     kembali = bayar - total
-    print("✔ Pembayaran berhasil! Kembalian:", kembali)
+    print("✔ Pembayaran berhasil!")
+
+    cetak_struk(total, bayar, kembali, keranjang)
+
     keranjang.clear()
+    
+    while True:
+        keluar = input("Apakah ingin keluar dari program? (y/n): ").lower()
+
+        if keluar == "y":
+            print("Program dihentikan. Terima kasih! 👋")
+            exit()
+        elif keluar == "n":
+            print("Kembali ke menu pembeli...")
+            return
+        else:
+            print("Input salah! Ketik 'y' atau 'n'.")
+
+
 
 # =============================
 # MENU OPERATOR
@@ -252,14 +285,16 @@ def tambah_buku():
 
 def restock_buku():
     tampil_buku()
-    judul = input("Judul buku untuk restock: ").lower()
-    for b in buku_list:
-        if b["judul"].lower() == judul:
-            tambah = int(input("Tambah stok: "))
-            b["stok"] += tambah
-            print("✔ Berhasil restock!")
-            return
-    print("❌ Buku tidak ditemukan!")
+    restock = True
+    while restock :
+        judul = input("Judul buku untuk restock: ").lower()
+        for b in buku_list:
+            if b["judul"].lower() == judul:
+                tambah = int(input("Tambah stok: "))
+                b["stok"] += tambah
+                print("✔ Berhasil restock!")
+                return
+        print("❌ Buku tidak ditemukan!")
 
 # =============================
 # MENU PEMBELI
@@ -284,6 +319,7 @@ def menu_pembeli():
             lihat_keranjang()
         elif pilih == "5":
             pembayaran()
+            break
         elif pilih == "6":
             break
         else:
@@ -352,5 +388,23 @@ def main():
         else:
             print("Input salah!")
 
+def cetak_struk(total, bayar, kembali, keranjang):
+    garis()
+    print("🧾 STRUK PEMBELIAN TOKO BUKU")
+    garis()
+
+    nomor = 1
+    for item in keranjang:
+        subtotal = item["harga"] * item["qty"]
+        print(f"{nomor}. {item['judul']} x{item['qty']} - Rp {subtotal}")
+        nomor += 1
+
+    print("--------------------------------------------")
+    print(f"Total Belanja : Rp {total}")
+    print(f"Uang Bayar    : Rp {bayar}")
+    print(f"Kembalian     : Rp {kembali}")
+    garis()
+    print("Terima kasih telah berbelanja!")
+    garis()
 
 main()
