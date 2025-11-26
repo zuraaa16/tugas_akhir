@@ -1,0 +1,356 @@
+# =============================
+# SISTEM TOKO BUKU SEDERHANA
+# =============================
+
+# ASCII BANNER
+def banner():
+    print(r"""
+   ████████╗ ██████╗ ██╗  ██╗ ██████╗     ██████╗ ██╗   ██╗██╗  ██╗
+   ╚══██╔══╝██╔═══██╗██║ ██╔╝██╔════╝     ██╔══██╗██║   ██║██║ ██╔╝
+      ██║   ██║   ██║█████╔╝ ██║  ███╗    ██████╔╝██║   ██║█████╔╝ 
+      ██║   ██║   ██║██╔═██╗ ██║   ██║    ██╔══██╗██║   ██║██╔═██╗ 
+      ██║   ╚██████╔╝██║  ██╗╚██████╔╝    ██████╔╝╚██████╔╝██║  ██╗
+      ╚═╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝     ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+             SISTEM TOKO BUKU • SIMPLE VERSION
+    """)
+
+# =============================
+# DATA BUKU
+# =============================
+
+buku_list = [
+    {
+        "judul": "Laskar Pelangi",
+        "penulis": "Andrea Hirata",
+        "harga": 80000,
+        "stok": 5,
+        "deskripsi": "Kisah inspiratif tentang anak-anak di Belitung.",
+        "rating": "4.5★"
+    },
+    {
+        "judul": "Bumi",
+        "penulis": "Tere Liye",
+        "harga": 90000,
+        "stok": 3,
+        "deskripsi": "Petualangan fantasi remaja dengan dunia misterius.",
+        "rating": "4★"
+    },
+    {
+        "judul": "Negeri 5 Menara",
+        "penulis": "A Fuadi",
+        "harga": 75000,
+        "stok": 4,
+        "deskripsi": "Perjalanan hidup penuh motivasi di pesantren.",
+        "rating": "4★"
+    },
+    {
+        "judul": "Mariposa",
+        "penulis": "Luluk HF",
+        "harga": 85000,
+        "stok": 7,
+        "deskripsi": "Cerita romantis remaja penuh perjuangan dan harapan.",
+        "rating": "4★"
+    },
+    {
+        "judul": "Ayat-Ayat Cinta",
+        "penulis": "Habiburrahman El Shirazy",
+        "harga": 79000,
+        "stok": 5,
+        "deskripsi": "Kisah cinta berlatar Mesir dengan nilai religius kuat.",
+        "rating": "5★"
+    },
+    {
+        "judul": "Koala Kumal",
+        "penulis": "Raditya Dika",
+        "harga": 60000,
+        "stok": 8,
+        "deskripsi": "Cerita humor dan pengalaman hidup cinta yang lucu.",
+        "rating": "4★"
+    },
+    {
+        "judul": "Ronggeng Dukuh Paruk",
+        "penulis": "Ahmad Tohari",
+        "harga": 72000,
+        "stok": 3,
+        "deskripsi": "Kisah kehidupan Srintil di sebuah desa tradisional Jawa.",
+        "rating": "4★"
+    },
+    {
+        "judul": "Dilan 1990",
+        "penulis": "Pidi Baiq",
+        "harga": 78000,
+        "stok": 9,
+        "deskripsi": "Romansa remaja Bandung yang penuh kenangan manis.",
+        "rating": "5★"
+    },
+    {
+        "judul": "Cantik Itu Luka",
+        "penulis": "Eka Kurniawan",
+        "harga": 95000,
+        "stok": 4,
+        "deskripsi": "Cerita epik tentang kehidupan, sejarah, dan tragedi keluarga.",
+        "rating": "5★"
+    },
+    {
+        "judul": "Pulang",
+        "penulis": "Leila S. Chudori",
+        "harga": 99000,
+        "stok": 6,
+        "deskripsi": "Kisah keluarga yang terpisah karena masa kelam sejarah Indonesia.",
+        "rating": "5★"
+    }
+]
+
+pembeli_akun = {"beli": "123"}
+keranjang = []
+
+# =============================
+# FUNGSI
+# =============================
+
+def garis():
+    print("=" * 60)
+
+def tampil_buku():
+    garis()
+    print("📚 DAFTAR BUKU TERSEDIA")
+    garis()
+
+    nomor = 1
+    for b in buku_list:
+        print(f"{nomor}. {b['judul']} - {b['penulis']} | Rp {b['harga']} | Stok: {b['stok']} | Rating: {b['rating']}")
+        nomor += 1
+
+
+def cari_buku():
+    ditemukan = False
+    while not ditemukan:
+        garis()
+        print("🔍 PENCARIAN BUKU")
+        garis()
+
+        kata = input("Masukkan judul atau penulis: ").lower()
+
+        nomor = 1
+        ditemukan = False
+
+        for b in buku_list:
+            if kata in b["judul"].lower() or kata in b["penulis"].lower():
+                print(f"{nomor}. {b['judul']} - {b['penulis']} | Rp {b['harga']}")
+                print("   Deskripsi:", b["deskripsi"])
+                print("   Rating:", b["rating"])
+                print("   Stok:", b["stok"])
+                nomor += 1
+                ditemukan = True
+
+        if not ditemukan:
+            print("❌ Tidak ditemukan! Coba lagi.")
+
+
+def tambah_keranjang():
+    tampil_buku()
+    while True:
+        pilih = input("Masukkan judul buku: ").lower()
+        for b in buku_list:
+            if b["judul"].lower() == pilih:
+                if b["stok"] > 0:
+                    keranjang.append(b)
+                    b["stok"] -= 1
+                    print("✔ Buku berhasil dimasukkan ke keranjang!")
+                else:
+                    print("❌ Stok habis!")
+                return
+        print("❌ Buku tidak ditemukan!")
+
+
+def lihat_keranjang():
+    garis()
+    print("🛒 KERANJANG BELANJA")
+    garis()
+
+    if len(keranjang) == 0:
+        print("Keranjang kosong.")
+        return
+
+    total = 0
+    nomor = 1
+    for b in keranjang:
+        print(f"{nomor}. {b['judul']} - Rp {b['harga']}")
+        total += b["harga"]
+        nomor += 1
+
+    print("💰 Total belanja: Rp", total)
+
+
+def pembayaran():
+    if len(keranjang) == 0:
+        print("Keranjang masih kosong!")
+        return
+
+    garis()
+    print("💵 PEMBAYARAN")
+    garis()
+
+    total = sum(b["harga"] for b in keranjang)
+    print("Total yang harus dibayar:", total)
+
+    bayar = int(input("Masukkan uang anda: "))
+
+    while bayar < total:
+        print("❌ Uang tidak cukup!")
+        bayar = int(input("Masukkan uang lagi: "))
+
+    kembali = bayar - total
+    print("✔ Pembayaran berhasil! Kembalian:", kembali)
+    keranjang.clear()
+
+# =============================
+# MENU OPERATOR
+# =============================
+
+def menu_operator():
+    while True:
+        garis()
+        print("⚙ MENU OPERATOR")
+        garis()
+        print("1. Tambah Buku\n2. Restock Buku\n3. Lihat Buku\n4. Logout")
+
+        pilih = input("Pilih: ")
+
+        if pilih == "1":
+            tambah_buku()
+        elif pilih == "2":
+            restock_buku()
+        elif pilih == "3":
+            tampil_buku()
+        elif pilih == "4":
+            break
+        else:
+            print("Input salah!")
+
+
+def tambah_buku():
+    print("=== Tambah Buku Baru ===")
+    judul = input("Judul: ")
+    penulis = input("Penulis: ")
+    harga = int(input("Harga: "))
+    stok = int(input("Stok: "))
+    deskripsi = input("Deskripsi: ")
+    rating = input("Rating: ")
+
+    buku_list.append({
+        "judul": judul,
+        "penulis": penulis,
+        "harga": harga,
+        "stok": stok,
+        "deskripsi": deskripsi,
+        "rating": rating
+    })
+
+    print("✔ Buku berhasil ditambahkan!")
+
+
+def restock_buku():
+    tampil_buku()
+    judul = input("Judul buku untuk restock: ").lower()
+    for b in buku_list:
+        if b["judul"].lower() == judul:
+            tambah = int(input("Tambah stok: "))
+            b["stok"] += tambah
+            print("✔ Berhasil restock!")
+            return
+    print("❌ Buku tidak ditemukan!")
+
+# =============================
+# MENU PEMBELI
+# =============================
+
+def menu_pembeli():
+    while True:
+        garis()
+        print("🧍 MENU PEMBELI")
+        garis()
+        print("1. Lihat Buku\n2. Cari Buku\n3. Tambah Keranjang\n4. Lihat Keranjang\n5. Pembayaran\n6. Logout")
+
+        pilih = input("Pilih: ")
+
+        if pilih == "1":
+            tampil_buku()
+        elif pilih == "2":
+            cari_buku()
+        elif pilih == "3":
+            tambah_keranjang()
+        elif pilih == "4":
+            lihat_keranjang()
+        elif pilih == "5":
+            pembayaran()
+        elif pilih == "6":
+            break
+        else:
+            print("Input salah!")
+
+
+# =============================
+# LOGIN SYSTEM
+# =============================
+
+def login_operator():
+    while True:
+        garis()
+        print("🔐 LOGIN OPERATOR")
+        garis()
+
+        user = input("Username: ")
+        pw = input("Password: ")
+
+        if user == "admin" and pw == "123":
+            print("✔ Login berhasil!")
+            menu_operator()
+            break
+        else:
+            print("❌ Salah! Coba lagi.")
+
+
+def login_pembeli():
+    while True:
+        garis()
+        print("🔐 LOGIN PEMBELI")
+        garis()
+
+        user = input("Username: ")
+        pw = input("Password: ")
+
+        if user in pembeli_akun and pembeli_akun[user] == pw:
+            print("✔ Login berhasil!")
+            menu_pembeli()
+            break
+        else:
+            print("❌ Username/password salah.")
+
+
+# =============================
+# MAIN MENU
+# =============================
+
+def main():
+    banner()
+    while True:
+        garis()
+        print("🏠 MENU UTAMA")
+        garis()
+
+        print("1. Login Operator\n2. Login Pembeli\n3. Keluar")
+        pilih = input("Pilih: ")
+
+        if pilih == "1":
+            login_operator()
+        elif pilih == "2":
+            login_pembeli()
+        elif pilih == "3":
+            print("Terima kasih telah menggunakan sistem ini.")
+            break
+        else:
+            print("Input salah!")
+
+
+main()
