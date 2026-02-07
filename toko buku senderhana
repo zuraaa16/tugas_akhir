@@ -1,4 +1,14 @@
 # =============================
+# Library
+# =============================
+
+from datetime import datetime, timezone, timedelta
+import random
+
+wib = timezone(timedelta(hours=7))
+now = datetime.now(wib)
+
+# =============================
 # SISTEM TOKO BUKU SEDERHANA
 # =============================
 
@@ -17,6 +27,20 @@ def banner():
 # =============================
 # DATA BUKU
 # =============================
+
+sambutan_operator = [
+    "Selamat bekerja, {nama} ⚙️",
+    "Mode operator aktif, {nama} 🔐",
+    "Siap kelola toko hari ini, {nama}? 📊",
+    "Dashboard siap digunakan, {nama} 💼"
+]
+
+sambutan_pembeli = [
+    "Selamat datang, {nama}! 📚",
+    "Halo {nama}, siap cari buku favoritmu? ✨",
+    "Senang melihatmu lagi, {nama} 😄",
+    "Satu buku, seribu petualangan, {nama} 🚀"
+]
 
 buku_list = [
     {
@@ -103,6 +127,7 @@ buku_list = [
 
 pembeli_akun = {"beli": "123"}
 keranjang = []
+nama = ""
 
 # =============================
 # FUNGSI
@@ -110,6 +135,25 @@ keranjang = []
 
 def garis():
     print("=" * 60)
+
+def tampil_sambutan(role):
+    if role == "operator":
+        pesan = random.choice(sambutan_operator)
+    elif role == "pembeli":
+        pesan = random.choice(sambutan_pembeli)
+    else:
+        return
+
+    print("💬", pesan.format(nama=nama))
+
+def sambutan_role(role):
+    if role == "operator":
+        return random.choice(sambutan_operator).format(nama=nama)
+    elif role == "pembeli":
+        return random.choice(sambutan_pembeli).format(nama=nama)
+    else:
+        return ""
+
 
 def tampil_buku():
     garis()
@@ -151,7 +195,7 @@ def tambah_keranjang():
     tampil_buku()
     bukuditemukan = True
     stokada = True
-    while bukuditemukan or stokada:
+    while bukuditemukan and stokada:
         pilih = input("Masukkan judul buku: ").lower()
         
         for b in buku_list:
@@ -218,8 +262,10 @@ def pembayaran():
 
     kembali = bayar - total
     print("✔ Pembayaran berhasil!")
-
-    cetak_struk(total, bayar, kembali, keranjang)
+    
+    now = datetime.now(wib).strftime("%d-%m-%Y %H:%M:%S")
+    
+    cetak_struk(total, bayar, kembali, keranjang, nama, now)
 
     keranjang.clear()
     
@@ -246,6 +292,7 @@ def menu_operator():
         garis()
         print("⚙ MENU OPERATOR")
         garis()
+        tampil_sambutan("operator")
         print("1. Tambah Buku\n2. Restock Buku\n3. Lihat Buku\n4. Logout")
 
         pilih = input("Pilih: ")
@@ -305,6 +352,7 @@ def menu_pembeli():
         garis()
         print("🧍 MENU PEMBELI")
         garis()
+        tampil_sambutan("pembeli")
         print("1. Lihat Buku\n2. Cari Buku\n3. Tambah Keranjang\n4. Lihat Keranjang\n5. Pembayaran\n6. Logout")
 
         pilih = input("Pilih: ")
@@ -319,7 +367,6 @@ def menu_pembeli():
             lihat_keranjang()
         elif pilih == "5":
             pembayaran()
-            break
         elif pilih == "6":
             break
         else:
@@ -369,12 +416,17 @@ def login_pembeli():
 # =============================
 
 def main():
+    global nama
     banner()
     while True:
         garis()
         print("🏠 MENU UTAMA")
         garis()
-
+        
+        print("Selamat datang di Toko Buku Tour De Force")
+        
+        nama = input("Nama anda: ")
+        
         print("1. Login Operator\n2. Login Pembeli\n3. Keluar")
         pilih = input("Pilih: ")
 
@@ -387,24 +439,43 @@ def main():
             break
         else:
             print("Input salah!")
+        
 
-def cetak_struk(total, bayar, kembali, keranjang):
-    garis()
-    print("🧾 STRUK PEMBELIAN TOKO BUKU")
-    garis()
+def cetak_struk(total, bayar, kembali, keranjang, nama, now):
+    lebar = 40
+    nama_file = f"struk_{nama}_{now.replace(':','-')}.txt"
 
-    nomor = 1
-    for item in keranjang:
-        subtotal = item["harga"] * item["qty"]
-        print(f"{nomor}. {item['judul']} x{item['qty']} - Rp {subtotal}")
-        nomor += 1
+    def tengah(teks):
+        return teks.center(lebar)
 
-    print("--------------------------------------------")
-    print(f"Total Belanja : Rp {total}")
-    print(f"Uang Bayar    : Rp {bayar}")
-    print(f"Kembalian     : Rp {kembali}")
-    garis()
-    print("Terima kasih telah berbelanja!")
-    garis()
+    with open(nama_file, "w", encoding="utf-8") as f:
+        f.write(tengah("TOKO BUKU TOUR DE FORCE") + "\n")
+        f.write(tengah("Jl. Pendidikan No. 1") + "\n")
+        f.write(tengah("Telp: 0834567890") + "\n")
+        f.write("=" * lebar + "\n")
+
+        f.write(f"Nama   : {nama}\n")
+        f.write(f"Tanggal: {now}\n")
+        f.write("-" * lebar + "\n")
+
+        for item in keranjang:
+            nama_buku = item["judul"][:20]
+            qty = item["qty"]
+            harga = item["harga"]
+            subtotal = harga * qty
+
+            f.write(f"{nama_buku}\n")
+            f.write(f"  {qty} x {harga:<10} {subtotal:>10}\n")
+
+        f.write("-" * lebar + "\n")
+        f.write(f"{'TOTAL':<20}{total:>20}\n")
+        f.write(f"{'TUNAI':<20}{bayar:>20}\n")
+        f.write(f"{'KEMBALI':<20}{kembali:>20}\n")
+        f.write("=" * lebar + "\n")
+
+        f.write(tengah("TERIMA KASIH") + "\n")
+        f.write(tengah("SELAMAT MEMBACA 📚") + "\n")
+
+    print(f"🖨️ Struk kasir tersimpan: {nama_file}")
 
 main()
